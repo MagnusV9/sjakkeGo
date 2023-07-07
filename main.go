@@ -1,3 +1,5 @@
+package main
+
 import(
 	"fmt"
 	"fyne.io/fyne/v2"
@@ -12,7 +14,6 @@ struct Board{
 	Rows int
 	Cols int
 }
-
 
 func newBoard(rows , cols int) Board{
 	board := make([][] interface{}, rows) 
@@ -61,6 +62,10 @@ func paintChessBoard(chessBoard *Board){ // kunne gjort den her generisk med en 
 
 }
 
+func layoutForChessboard (board Board) fyne.CanvasObject{
+	return container.NewGridWithColumns(board.Rows), board.Grid...)
+}
+
 func main{
 	myApp := app.New()
 	chessBoard := myApp.NewWindow("Chessboard")
@@ -69,10 +74,9 @@ func main{
 
 	paintChessBoard(&board)
 
+	content := container.New(board)
 
-
-
-
-
-
+	myWindow.SetContent(content)
+	myWindow.ShowAndRun()
+	
 }
