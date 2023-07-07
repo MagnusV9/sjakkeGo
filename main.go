@@ -1,3 +1,12 @@
+import(
+	"fmt"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/container"
+)
+
+
 struct Board{
 	Grid [][] interface{}
 	Rows int
@@ -5,7 +14,7 @@ struct Board{
 }
 
 
-func newBoard(rows , cols int) Grid{
+func newBoard(rows , cols int) Board{
 	board := make([][] interface{}, rows) 
 	for i := range board{
 		board[i] = make([] interface{}, cols)
@@ -34,11 +43,36 @@ func (b *Board) FillBoard(value interface{}){
 	}
 }
 
-func (b *Board) DrawBoard(){
+func paintChessBoard(chessBoard *Board){ // kunne gjort den her generisk med en funksjon som parameter for å farg brettet.
+	for i:= 0; i < chessBoard.Rows; i++{
+		for j := 0; j < chessBoard.Cols; j++{
+			var color string
+			if (i+j) % 2 == 0{
+				color = "#FFFFFF"
+			} else{
+				color = "#000000"
+			}
+			board[i][j] = canvas.NewRectangle(&fyne.StaticResource{
+				StaticName: "color",
+				Content: []byte(color),
+			})
+		}
+	}
 
 }
 
-
 func main{
+	myApp := app.New()
+	chessBoard := myApp.NewWindow("Chessboard")
+
+	board := newBoard(8,8)
+
+	paintChessBoard(&board)
+
+
+
+
+
+
 
 }
