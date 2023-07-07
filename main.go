@@ -9,7 +9,7 @@ import(
 )
 
 
-struct Board{
+type Board struct{
 	Grid [][] interface{}
 	Rows int
 	Cols int
@@ -23,7 +23,7 @@ func newBoard(rows , cols int) Board{
 	return Board{
 		Grid : board,
 		Rows : rows,
-		Cols : cols
+		Cols : cols,
 	}
 }
 
@@ -66,7 +66,7 @@ func layoutForChessboard (board Board) fyne.CanvasObject{
 	return container.NewGridWithColumns(board.Rows), board.Grid...)
 }
 
-func main{
+func main(){
 	myApp := app.New()
 	chessBoard := myApp.NewWindow("Chessboard")
 
