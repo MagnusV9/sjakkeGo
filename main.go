@@ -8,6 +8,60 @@ import (
 	"image/color"
 )
 
+type King struct {
+	Image  string
+	Player string
+}
+
+func (k King) availableMoves(gameBoard Board) [][]int {
+	return [][]int
+}
+
+type Queen struct {
+	Image string
+	Player string
+}
+
+func (q Queen) availableMoves(gameBoard Board) [][]int{
+	
+}
+
+type Rook struct{
+	Image string
+	Player string
+}
+
+func (r Rook) availableMoves(gameBoard Board) [][]int{
+	
+}
+
+type Bishop struct {
+	Image string
+	Player string
+}
+
+func (b Bishop) availableMoves(gameBoard Board) [][]int{
+	
+}
+
+type Knight struct{
+	Image string
+	Player string
+}
+
+func (k Knight) availableMoves(gameBoard Board) [][]int{
+	
+}
+
+type Pawn struct{
+	Image string
+	Player string
+}
+
+func (p Pawn) availableMoves(gameBoard Board) [][]int{
+	
+}
+
 type Board struct {
 	Grid [][]fyne.CanvasObject
 	Rows int
