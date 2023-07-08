@@ -1,82 +1,64 @@
 package main
 
-import(
-	"fmt"
+import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"image/color"
 )
 
-
-type Board struct{
-	Grid [][] interface{}
+type Board struct {
+	Grid [][]fyne.CanvasObject
 	Rows int
 	Cols int
 }
 
-func newBoard(rows , cols int) Board{
-	board := make([][] interface{}, rows) 
-	for i := range board{
-		board[i] = make([] interface{}, cols)
+func newBoard(rows, cols int) Board {
+	board := make([][]fyne.CanvasObject, rows)
+	for i := range board {
+		board[i] = make([]fyne.CanvasObject, cols)
 	}
 	return Board{
-		Grid : board,
-		Rows : rows,
-		Cols : cols,
+		Grid: board,
+		Rows: rows,
+		Cols: cols,
 	}
 }
 
-func (b *Board) Get(rows, cols) interface{}{
-	return  b[rows][cols]
-}
-
-func (b *Board) Set(rows, cols, value interface{}){
-	b[rows][cols] = value
-}
-
-
-func (b *Board) FillBoard(value interface{}){
-	for i := range b.Rows{
-		for j := range b.Cols{
-			b[i][j] = value
-		}
-	}
-}
-
-func paintChessBoard(chessBoard *Board){ // kunne gjort den her generisk med en funksjon som parameter for å farg brettet.
-	for i:= 0; i < chessBoard.Rows; i++{
-		for j := 0; j < chessBoard.Cols; j++{
-			var color string
-			if (i+j) % 2 == 0{
-				color = "#FFFFFF"
-			} else{
-				color = "#000000"
+func paintChessBoard(chessBoard *Board) {
+	for i := 0; i < chessBoard.Rows; i++ {
+		for j := 0; j < chessBoard.Cols; j++ {
+			rect := canvas.NewRectangle(color.Black)
+			if (i+j)%2 == 0 {
+				rect.FillColor = color.White
+			} else {
+				rect.FillColor = color.Black
 			}
-			board[i][j] = canvas.NewRectangle(&fyne.StaticResource{
-				StaticName: "color",
-				Content: []byte(color),
-			})
+			rect.Refresh()
+			chessBoard.Grid[i][j] = rect
 		}
 	}
-
 }
 
-func layoutForChessboard (board Board) fyne.CanvasObject{
-	return container.NewGridWithColumns(board.Rows), board.Grid...)
+func layoutForChessboard(board Board) fyne.CanvasObject {
+	grid := container.NewGridWithColumns(board.Cols)
+	for _, row := range board.Grid {
+		for _, cell := range row {
+			grid.Add(cell)
+		}
+	}
+	return grid
 }
 
-func main(){
+func main() {
 	myApp := app.New()
-	chessBoard := myApp.NewWindow("Chessboard")
+	myWindow := myApp.NewWindow("Chessboard")
 
-	board := newBoard(8,8)
-
+	board := newBoard(8, 8)
 	paintChessBoard(&board)
 
-	content := container.New(board)
-
+	content := layoutForChessboard(board)
 	myWindow.SetContent(content)
 	myWindow.ShowAndRun()
-	
 }
