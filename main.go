@@ -68,40 +68,100 @@ func (b Board) setBoard() Board {
 
 			case i == 0 && j == 1 || i == 0 && j == 6:
 				knight := Knight{
-					Image: "./assets/whitepieces/player/knight.svg",
+					Image:  "./assets/whitepieces/player/knight.svg",
 					Player: "white",
-					Pos: Position{X: i, Y: j})
+					Pos:    Position{X: i, Y: j},
 				}
 				board[i][j] = knight
+
 			case i == 0 && j == 2 || i == 0 && j == 5:
 				bishop := Bishop{
-					Image: "./assets/whitepieces/player/bishop.svg",
+					Image:  "./assets/whitepieces/player/bishop.svg",
 					Player: "white",
-					Pos: Position{X: i, Y: j}
+					Pos:    Position{X: i, Y: j},
 				}
 				board[i][j] = bishop
+
 			case i == 0 && j == 3:
 				queen := Queen{
-					Image: "./assets/whitepieces/player/queen.svg",
+					Image:  "./assets/whitepieces/player/queen.svg",
 					Player: "white",
-					Pos: Position{X: i, Y: j}
+					Pos:    Position{X: i, Y: j},
 				}
-				board[i][j] = bishop
+				board[i][j] = queen
+
 			case i == 0 && j == 4:
 				king := King{
-					Image: "./assets/whitepieces/player/king.svg",
+					Image:  "./assets/whitepieces/player/king.svg",
 					Player: "white",
-					Pos: Position{X: i, Y: j}
+					Pos:    Position{X: i, Y: j},
 				}
 				board[i][j] = king
+
 			default:
 				pawn := Pawn{
-					Image: "./assets/whitepieces/player/pawn.svg",
+					Image:  "./assets/whitepieces/player/pawn.svg",
 					Player: "white",
-					Pos: Position{X: i, Y: j}
+					Pos:    Position{X: i, Y: j},
 				}
 				board[i][j] = pawn
 			}
+		}
+	}
+
+	for i := 6; i < 8; i++ {
+		for j := 0; j < 8; j++ {
+			switch {
+			case i == 7 && j == 0 || i == 7 && j == 7:
+				rook := Rook{
+					Image:  "./assets/whitepieces/player/rook.svg",
+					Player: "white",
+					Pos:    Position{X: i, Y: j},
+				}
+				board[i][j] = rook
+
+			case i == 7 && j == 1 || i == 7 && j == 6:
+
+				knight := Knight{
+					Image:  "./assets/whitepieces/player/knight.svg",
+					Player: "white",
+					Pos:    Position{X: i, Y: j},
+				}
+				board[i][j] = knight
+
+			case i == 7 && j == 2 || i == 7 && j == 5:
+				bishop := Bishop{
+					Image:  "./assets/whitepieces/player/bishop.svg",
+					Player: "white",
+					Pos:    Position{X: i, Y: j},
+				}
+				board[i][j] = bishop
+			case i == 7 && j == 4:
+
+				queen := Queen{
+					Image:  "./assets/whitepieces/player/queen.svg",
+					Player: "white",
+					Pos:    Position{X: i, Y: j},
+				}
+				board[i][j] = queen
+
+			case i == 7 && j == 3:
+				king := King{
+					Image:  "./assets/whitepieces/player/king.svg",
+					Player: "white",
+					Pos:    Position{X: i, Y: j},
+				}
+				board[i][j] = king
+
+			default:
+				pawn := Pawn{
+					Image:  "./assets/whitepieces/player/pawn.svg",
+					Player: "white",
+					Pos:    Position{X: i, Y: j},
+				}
+				board[i][j] = pawn
+			}
+
 		}
 	}
 
@@ -118,11 +178,10 @@ type King struct {
 	Pos    Position
 }
 
-/*
 func (k King) availableMoves(gameBoard Board) [][]Position {
-	return [][]int
+	return nil
 }
-*/
+
 func (k King) move(gameBoard *Board) {
 
 }
@@ -135,10 +194,10 @@ type Queen struct {
 }
 
 func (q Queen) availableMoves(gameBoard Board) [][]Position {
-
+	return nil
 }
 
-func (q Queen) move(gameBoard Board) {
+func (q Queen) move(gameBoard *Board) {
 
 }
 
@@ -150,7 +209,7 @@ type Rook struct {
 }
 
 func (r Rook) availableMoves(gameBoard Board) [][]Position {
-
+	return nil
 }
 
 func (r Rook) move(gameBoard *Board) {
@@ -165,6 +224,11 @@ type Bishop struct {
 }
 
 func (b Bishop) availableMoves(gameBoard Board) [][]Position {
+	return nil
+
+}
+
+func (b Bishop) move(gameBoard *Board) {
 
 }
 
@@ -175,6 +239,10 @@ type Knight struct {
 }
 
 func (k Knight) availableMoves(gameBoard Board) [][]Position {
+	return nil
+}
+
+func (k Knight) move(gameBoard *Board) {
 
 }
 
@@ -185,6 +253,10 @@ type Pawn struct {
 }
 
 func (p Pawn) availableMoves(gameBoard Board) [][]Position {
+	return nil
+}
+
+func (p Pawn) move(gameBoard *Board) {
 
 }
 
