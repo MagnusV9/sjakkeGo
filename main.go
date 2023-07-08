@@ -8,6 +8,7 @@ import (
 	"image/color"
 )
 
+/*
 var pathToPlayerBlackPieces = string[]{
 	"./assets/blackpieces/player/king.svg",
 	"./assets/blackpieces/player/queen.svg",
@@ -44,7 +45,8 @@ var pathToOpponentWhitePieces = string[]{
 	"./assets/whitepieces/opponent/pawn.svg",
 	"./assets/whitepieces/opponent/knight.svg",
 }
-
+*/
+/*
 type King struct {
 	Image  string
 	Player string
@@ -60,7 +62,7 @@ type Queen struct {
 }
 
 func (q Queen) availableMoves(gameBoard Board) [][]int{
-	
+
 }
 
 type Rook struct{
@@ -69,7 +71,7 @@ type Rook struct{
 }
 
 func (r Rook) availableMoves(gameBoard Board) [][]int{
-	
+
 }
 
 type Bishop struct {
@@ -78,7 +80,7 @@ type Bishop struct {
 }
 
 func (b Bishop) availableMoves(gameBoard Board) [][]int{
-	
+
 }
 
 type Knight struct{
@@ -87,7 +89,7 @@ type Knight struct{
 }
 
 func (k Knight) availableMoves(gameBoard Board) [][]int{
-	
+
 }
 
 type Pawn struct{
@@ -96,9 +98,9 @@ type Pawn struct{
 }
 
 func (p Pawn) availableMoves(gameBoard Board) [][]int{
-	
-}
 
+}
+*/
 type Board struct {
 	Grid [][]fyne.CanvasObject
 	Rows int
@@ -120,11 +122,9 @@ func newBoard(rows, cols int) Board {
 func paintChessBoard(chessBoard *Board) {
 	for i := 0; i < chessBoard.Rows; i++ {
 		for j := 0; j < chessBoard.Cols; j++ {
-			rect := canvas.NewRectangle(color.Black)
+			rect := canvas.NewRectangle(&color.RGBA{R: 150, G: 77, B: 55, A: 1})
 			if (i+j)%2 == 0 {
 				rect.FillColor = color.White
-			} else {
-				rect.FillColor = color.Black
 			}
 			rect.Refresh()
 			chessBoard.Grid[i][j] = rect
