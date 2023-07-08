@@ -5,287 +5,177 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"github.com/gogo/protobuf/plugin/stringer"
 	"image/color"
 )
 
-var pathToPlayerBlackPieces = []string{
-	"./assets/blackpieces/player/king.svg",
-	"./assets/blackpieces/player/queen.svg",
-	"./assets/blackpieces/player/rook.svg",
-	"./assets/blackpieces/player/bishop.svg",
-	"./assets/blackpieces/player/pawn.svg",
-	"./assets/blackpieces/player/knight.svg",
+const (
+	playerPathPrefix      = "./assets"
+	opponentPathPrefix    = "./assets"
+	playerPiecesSubPath   = "player"
+	opponentPiecesSubPath = "opponent"
+)
+
+var pieces = []string{"king", "queen", "rook", "bishop", "pawn", "knight"}
+var colors = []string{"blackpieces", "whitepieces"}
+
+func getPathToPieces(color, role string) []string {
+	var paths []string
+	prefix := playerPathPrefix
+	if role == "opponent" {
+		prefix = opponentPathPrefix
+	}
+
+	for _, piece := range pieces {
+		paths = append(paths, prefix+"/"+color+"/"+role+"/"+piece+".svg")
+	}
+
+	return paths
 }
 
-var pathToOpponentBlackPieces = []string{
-	"./assets/blackpieces/opponent/king.svg",
-	"./assets/blackpieces/opponent/queen.svg",
-	"./assets/blackpieces/opponent/rook.svg",
-	"./assets/blackpieces/opponent/bishop.svg",
-	"./assets/blackpieces/opponent/pawn.svg",
-	"./assets/blackpieces/opponent/knight.svg",
+type Position struct {
+	X, Y int
 }
 
-var pathToPlayerWhitePieces = []string{
-	"./assets/whitepieces/player/king.svg",
-	"./assets/whitepieces/player/queen.svg",
-	"./assets/whitepieces/player/rook.svg",
-	"./assets/whitepieces/player/bishop.svg",
-	"./assets/whitepieces/player/pawn.svg",
-	"./assets/whitepieces/player/knight.svg",
+type Piece interface {
+	AvailableMoves(gameBoard Board) [][]Position
+	Move(gameBoard *Board)
 }
 
-var pathToOpponentWhitePieces = []string{
-	"./assets/whitepieces/opponent/king.svg",
-	"./assets/whitepieces/opponent/queen.svg",
-	"./assets/whitepieces/opponent/rook.svg",
-	"./assets/whitepieces/opponent/bishop.svg",
-	"./assets/whitepieces/opponent/pawn.svg",
-	"./assets/whitepieces/opponent/knight.svg",
+type ChessPiece struct {
+	Image  string
+	Player string
+	Pos    Position
+}
+
+type King struct {
+	ChessPiece
+}
+
+func (k King) AvailableMoves(gameBoard Board) [][]Position {
+	return nil
+}
+
+func (k King) Move(gameBoard *Board) {
+
+}
+
+type Queen struct {
+	ChessPiece
+}
+
+func (q Queen) AvailableMoves(gameBoard Board) [][]Position {
+	return nil
+}
+
+func (q Queen) Move(gameBoard *Board) {
+
+}
+
+type Rook struct {
+	ChessPiece
+}
+
+func (r Rook) AvailableMoves(gameBoard Board) [][]Position {
+	return nil
+}
+
+func (r Rook) Move(gameBoard *Board) {
+
+}
+
+type Bishop struct {
+	ChessPiece
+}
+
+func (b Bishop) AvailableMoves(gameBoard Board) [][]Position {
+	return nil
+}
+
+func (b Bishop) Move(gameBoard *Board) {
+
+}
+
+type Knight struct {
+	ChessPiece
+}
+
+func (k Knight) AvailableMoves(gameBoard Board) [][]Position {
+	return nil
+}
+
+func (k Knight) Move(gameBoard *Board) {
+
+}
+
+type Pawn struct {
+	ChessPiece
+}
+
+func (p Pawn) AvailableMoves(gameBoard Board) [][]Position {
+	return nil
+}
+
+func (p Pawn) Move(gameBoard *Board) {
+
 }
 
 type Board struct {
 	Grid [][]Piece
 }
 
-func (b Board) setBoard() Board {
-	board := make([][]Piece, 8)
-	for i := range board {
-		board[i] = make([]Piece, 8)
+func NewBoard() *Board {
+	board := &Board{
+		Grid: make([][]Piece, 8),
 	}
 
+	for i := range board.Grid {
+		board.Grid[i] = make([]Piece, 8)
+	}
+
+	return board
+}
+
+func (b *Board) SetupBoard() {
 	for i := 0; i < 2; i++ {
-		for j := 0; j < 8; j++ {
-			switch {
-			case i == 0 && j == 0 || i == 0 && j == 7:
-				rook := Rook{
-					Image:  "./assets/whitepieces/player/rook.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = rook
-
-			case i == 0 && j == 1 || i == 0 && j == 6:
-				knight := Knight{
-					Image:  "./assets/whitepieces/player/knight.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = knight
-
-			case i == 0 && j == 2 || i == 0 && j == 5:
-				bishop := Bishop{
-					Image:  "./assets/whitepieces/player/bishop.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = bishop
-
-			case i == 0 && j == 3:
-				queen := Queen{
-					Image:  "./assets/whitepieces/player/queen.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = queen
-
-			case i == 0 && j == 4:
-				king := King{
-					Image:  "./assets/whitepieces/player/king.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = king
-
-			default:
-				pawn := Pawn{
-					Image:  "./assets/whitepieces/player/pawn.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = pawn
-			}
-		}
+		b.SetupRow(i, "white", "player")
 	}
-
 	for i := 6; i < 8; i++ {
-		for j := 0; j < 8; j++ {
-			switch {
-			case i == 7 && j == 0 || i == 7 && j == 7:
-				rook := Rook{
-					Image:  "./assets/whitepieces/player/rook.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = rook
-
-			case i == 7 && j == 1 || i == 7 && j == 6:
-
-				knight := Knight{
-					Image:  "./assets/whitepieces/player/knight.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = knight
-
-			case i == 7 && j == 2 || i == 7 && j == 5:
-				bishop := Bishop{
-					Image:  "./assets/whitepieces/player/bishop.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = bishop
-			case i == 7 && j == 4:
-
-				queen := Queen{
-					Image:  "./assets/whitepieces/player/queen.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = queen
-
-			case i == 7 && j == 3:
-				king := King{
-					Image:  "./assets/whitepieces/player/king.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = king
-
-			default:
-				pawn := Pawn{
-					Image:  "./assets/whitepieces/player/pawn.svg",
-					Player: "white",
-					Pos:    Position{X: i, Y: j},
-				}
-				board[i][j] = pawn
-			}
-
-		}
+		b.SetupRow(i, "black", "opponent")
 	}
-
 }
 
-type Piece interface {
-	availableMoves(gameBoard Board) [][]Position
-	move(gameBoard *Board)
-}
-
-type King struct {
-	Image  string
-	Player string
-	Pos    Position
-}
-
-func (k King) availableMoves(gameBoard Board) [][]Position {
-	return nil
-}
-
-func (k King) move(gameBoard *Board) {
-
-}
-
-type Queen struct {
-	Image    string
-	Player   string
-	Opponent string
-	Pos      Position
-}
-
-func (q Queen) availableMoves(gameBoard Board) [][]Position {
-	return nil
-}
-
-func (q Queen) move(gameBoard *Board) {
-
-}
-
-type Rook struct {
-	Image    string
-	Player   string
-	Opponent string
-	Pos      Position
-}
-
-func (r Rook) availableMoves(gameBoard Board) [][]Position {
-	return nil
-}
-
-func (r Rook) move(gameBoard *Board) {
-
-}
-
-type Bishop struct {
-	Image    string
-	Player   string
-	Opponent string
-	Pos      Position
-}
-
-func (b Bishop) availableMoves(gameBoard Board) [][]Position {
-	return nil
-
-}
-
-func (b Bishop) move(gameBoard *Board) {
-
-}
-
-type Knight struct {
-	Image  string
-	Player string
-	Pos    Position
-}
-
-func (k Knight) availableMoves(gameBoard Board) [][]Position {
-	return nil
-}
-
-func (k Knight) move(gameBoard *Board) {
-
-}
-
-type Pawn struct {
-	Image  string
-	Player string
-	Pos    Position
-}
-
-func (p Pawn) availableMoves(gameBoard Board) [][]Position {
-	return nil
-}
-
-func (p Pawn) move(gameBoard *Board) {
-
-}
-
-type Position struct {
-	X int
-	Y int
-}
-
-type Move struct {
-	Start Position
-	End   Position
+func (b *Board) SetupRow(row int, color, role string) {
+	piecePaths := getPathToPieces(color, role)
+	for col := 0; col < 8; col++ {
+		b.Grid[row][col] = &Pawn{ChessPiece{piecePaths[4], color, Position{X: row, Y: col}}}
+	}
+	switch {
+	case row%7 == 0:
+		b.Grid[row][0], b.Grid[row][7] = &Rook{ChessPiece{piecePaths[2], color, Position{X: row, Y: 0}}}, &Rook{ChessPiece{piecePaths[2], color, Position{X: row, Y: 7}}}
+		b.Grid[row][1], b.Grid[row][6] = &Knight{ChessPiece{piecePaths[5], color, Position{X: row, Y: 1}}}, &Knight{ChessPiece{piecePaths[5], color, Position{X: row, Y: 6}}}
+		b.Grid[row][2], b.Grid[row][5] = &Bishop{ChessPiece{piecePaths[3], color, Position{X: row, Y: 2}}}, &Bishop{ChessPiece{piecePaths[3], color, Position{X: row, Y: 5}}}
+		b.Grid[row][3] = &Queen{ChessPiece{piecePaths[1], color, Position{X: row, Y: 3}}}
+		b.Grid[row][4] = &King{ChessPiece{piecePaths[0], color, Position{X: row, Y: 4}}}
+	}
 }
 
 type GUIBoard struct {
-	Grid [][]fyne.CanvasObject
-	Rows int
-	Cols int
+	Grid       [][]fyne.CanvasObject
+	Rows, Cols int
 }
 
-func newGUIBoard(rows, cols int) GUIBoard {
-	board := make([][]fyne.CanvasObject, rows)
-	for i := range board {
-		board[i] = make([]fyne.CanvasObject, cols)
-	}
-	return GUIBoard{
-		Grid: board,
+func newGUIBoard(rows, cols int) *GUIBoard {
+	board := &GUIBoard{
+		Grid: make([][]fyne.CanvasObject, rows),
 		Rows: rows,
 		Cols: cols,
 	}
+
+	for i := range board.Grid {
+		board.Grid[i] = make([]fyne.CanvasObject, cols)
+	}
+
+	return board
 }
 
 func paintChessBoard(chessBoard *GUIBoard) {
@@ -301,7 +191,7 @@ func paintChessBoard(chessBoard *GUIBoard) {
 	}
 }
 
-func layoutForChessboard(board GUIBoard) fyne.CanvasObject {
+func layoutForChessboard(board *GUIBoard) fyne.CanvasObject {
 	grid := container.NewGridWithColumns(board.Cols)
 	for _, row := range board.Grid {
 		for _, cell := range row {
@@ -316,7 +206,7 @@ func main() {
 	myWindow := myApp.NewWindow("Chessboard")
 
 	guiBoard := newGUIBoard(8, 8)
-	paintChessBoard(&guiBoard)
+	paintChessBoard(guiBoard)
 
 	content := layoutForChessboard(guiBoard)
 	myWindow.SetContent(content)
