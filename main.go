@@ -6,6 +6,8 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"image/color"
+	"io/ioutil"
+	"log"
 )
 
 const (
@@ -39,6 +41,7 @@ type Position struct {
 type Piece interface {
 	AvailableMoves(gameBoard Board) [][]Position
 	Move(gameBoard *Board)
+	Image() string
 }
 
 type ChessPiece struct {
@@ -47,12 +50,52 @@ type ChessPiece struct {
 	Pos    Position
 }
 
+func drawPiece(piece Piece) *canvas.Image {
+	svgData, err := ioutil.ReadFile(piece.Image())
+	if err != nil {
+		log.Fatalf("Failed to read file: %v", err)
+	}
+
+	svgResource := fyne.NewStaticResource(piece.Image(), svgData)
+
+	return canvas.NewImageFromResource(svgResource)
+}
+
+func paintChessBoard(chessBoard *GUIBoard, gameBoard *Board) {
+	for i := 0; i < chessBoard.Rows; i++ {
+		for j := 0; j < chessBoard.Cols; j++ {
+			rect := canvas.NewRectangle(&color.RGBA{R: 150, G: 77, B: 55, A: 1})
+			if (i+j)%2 == 0 {
+				rect.FillColor = color.White
+			}
+			rect.Refresh()
+
+			// create a container for the square
+			square := container.NewMax(rect)
+
+			// draw piece if it exists
+			piece := gameBoard.Grid[i][j]
+			if piece != nil {
+				img := drawPiece(piece)
+				img.FillMode = canvas.ImageFillContain
+				square.Add(img)
+			}
+
+			chessBoard.Grid[i][j] = square
+		}
+	}
+}
+
 type King struct {
 	ChessPiece
 }
 
 func (k King) AvailableMoves(gameBoard Board) [][]Position {
 	return nil
+}
+
+func (k King) Image() string {
+	return k.ChessPiece.Image
 }
 
 func (k King) Move(gameBoard *Board) {
@@ -71,8 +114,16 @@ func (q Queen) Move(gameBoard *Board) {
 
 }
 
+func (q Queen) Image() string {
+	return q.ChessPiece.Image
+}
+
 type Rook struct {
 	ChessPiece
+}
+
+func (r Rook) Image() string {
+	return r.ChessPiece.Image
 }
 
 func (r Rook) AvailableMoves(gameBoard Board) [][]Position {
@@ -87,6 +138,10 @@ type Bishop struct {
 	ChessPiece
 }
 
+func (b Bishop) Image() string {
+	return b.ChessPiece.Image
+}
+
 func (b Bishop) AvailableMoves(gameBoard Board) [][]Position {
 	return nil
 }
@@ -99,6 +154,10 @@ type Knight struct {
 	ChessPiece
 }
 
+func (k Knight) Image() string {
+	return k.ChessPiece.Image
+}
+
 func (k Knight) AvailableMoves(gameBoard Board) [][]Position {
 	return nil
 }
@@ -109,6 +168,10 @@ func (k Knight) Move(gameBoard *Board) {
 
 type Pawn struct {
 	ChessPiece
+}
+
+func (p Pawn) Image() string {
+	return p.ChessPiece.Image
 }
 
 func (p Pawn) AvailableMoves(gameBoard Board) [][]Position {
@@ -178,19 +241,6 @@ func newGUIBoard(rows, cols int) *GUIBoard {
 	return board
 }
 
-func paintChessBoard(chessBoard *GUIBoard) {
-	for i := 0; i < chessBoard.Rows; i++ {
-		for j := 0; j < chessBoard.Cols; j++ {
-			rect := canvas.NewRectangle(&color.RGBA{R: 150, G: 77, B: 55, A: 1})
-			if (i+j)%2 == 0 {
-				rect.FillColor = color.White
-			}
-			rect.Refresh()
-			chessBoard.Grid[i][j] = rect
-		}
-	}
-}
-
 func layoutForChessboard(board *GUIBoard) fyne.CanvasObject {
 	grid := container.NewGridWithColumns(board.Cols)
 	for _, row := range board.Grid {
@@ -203,10 +253,14 @@ func layoutForChessboard(board *GUIBoard) fyne.CanvasObject {
 
 func main() {
 	myApp := app.New()
-	myWindow := myApp.NewWindow("Chessboard")
+	myWindow := myApp.NewWindow("Chess")
 
 	guiBoard := newGUIBoard(8, 8)
-	paintChessBoard(guiBoard)
+
+	gameBoard := NewBoard()
+	gameBoard.SetupBoard()
+
+	paintChessBoard(guiBoard, gameBoard)
 
 	content := layoutForChessboard(guiBoard)
 	myWindow.SetContent(content)
