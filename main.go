@@ -323,7 +323,7 @@ func (p Pawn) AvailableMoves(gameBoard *Board) [][]Position {
 
 	// TODO implement en pasant ruleset.
 
-	for _, direction := range [][]int{{-1, -1}, {-1, 1}, {1, -1}, {1, 1}} {
+	for _, direction := range [][]int{{-1, -1}, {-1, 1}, {-1,0} {1, -1}, {1, 1}, {1,0}} { // TODO dette er feil, må sjekke om det er player eller opponent for å vite hvilken retning den skal gå.
 		newX, newY := p.Pos.X+direction[0], p.Pos.Y+direction[1]
 		newPos := Position{X: newX, Y: newY}
 		if !gameBoard.IsLegalMove(newPos) {
