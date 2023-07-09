@@ -114,7 +114,49 @@ type Queen struct {
 }
 
 func (q Queen) AvailableMoves(gameBoard *Board) [][]Position {
-	return nil
+	moves := [][]Position{}
+
+	// Horizontal and vertical directions
+	for _, direction := range [][]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}} {
+		for i := 1; i < 8; i++ {
+			newX, newY := q.Pos.X+direction[0]*i, q.Pos.Y+direction[1]*i
+			newPos := Position{X: newX, Y: newY}
+			if !gameBoard.IsLegalMove(newPos) {
+				break
+			}
+			target := gameBoard.Grid[newX][newY]
+			if target == nil {
+				moves = append(moves, []Position{newPos})
+			} else {
+				if target.GetPlayer() != q.Player {
+					moves = append(moves, []Position{newPos})
+				}
+				break
+			}
+		}
+	}
+
+	// Diagonal directions
+	for _, direction := range [][]int{{-1, -1}, {-1, 1}, {1, -1}, {1, 1}} {
+		for i := 1; i < 8; i++ {
+			newX, newY := q.Pos.X+direction[0]*i, q.Pos.Y+direction[1]*i
+			newPos := Position{X: newX, Y: newY}
+			if !gameBoard.IsLegalMove(newPos) {
+				break
+			}
+			target := gameBoard.Grid[newX][newY]
+			if target == nil {
+				moves = append(moves, []Position{newPos})
+			} else {
+				if target.GetPlayer() != q.Player {
+					moves = append(moves, []Position{newPos})
+				}
+				break
+			}
+		}
+	}
+
+	return moves
 }
 
 func (q *Queen) GetPlayer() string {
@@ -142,7 +184,29 @@ func (r Rook) Image() string {
 }
 
 func (r Rook) AvailableMoves(gameBoard *Board) [][]Position {
-	return nil
+	moves := [][]Position{}
+
+	// Horizontal and vertical directions
+	for _, direction := range [][]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}} {
+		for i := 1; i < 8; i++ {
+			newX, newY := r.Pos.X+direction[0]*i, r.Pos.Y+direction[1]*i
+			newPos := Position{X: newX, Y: newY}
+			if !gameBoard.IsLegalMove(newPos) {
+				break
+			}
+			target := gameBoard.Grid[newX][newY]
+			if target == nil {
+				moves = append(moves, []Position{newPos})
+			} else {
+				if target.GetPlayer() != r.Player {
+					moves = append(moves, []Position{newPos})
+				}
+				break
+			}
+		}
+	}
+
+	return moves
 }
 
 func (r *Rook) GetPlayer() string {
@@ -166,7 +230,29 @@ func (b Bishop) Image() string {
 }
 
 func (b Bishop) AvailableMoves(gameBoard *Board) [][]Position {
-	return nil
+	moves := [][]Position{}
+
+	// Diagonal directions
+	for _, direction := range [][]int{{-1, -1}, {-1, 1}, {1, -1}, {1, 1}} {
+		for i := 1; i < 8; i++ {
+			newX, newY := b.Pos.X+direction[0]*i, b.Pos.Y+direction[1]*i
+			newPos := Position{X: newX, Y: newY}
+			if !gameBoard.IsLegalMove(newPos) {
+				break
+			}
+			target := gameBoard.Grid[newX][newY]
+			if target == nil {
+				moves = append(moves, []Position{newPos})
+			} else {
+				if target.GetPlayer() != b.Player {
+					moves = append(moves, []Position{newPos})
+				}
+				break
+			}
+		}
+	}
+
+	return moves
 }
 
 func (b *Bishop) GetPlayer() string {
@@ -190,7 +276,22 @@ func (k Knight) Image() string {
 }
 
 func (k Knight) AvailableMoves(gameBoard *Board) [][]Position {
-	return nil
+	moves := [][]Position{}
+
+	// L-shaped directions
+	for _, direction := range [][]int{{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1}} {
+		newX, newY := k.Pos.X+direction[0], k.Pos.Y+direction[1]
+		newPos := Position{X: newX, Y: newY}
+		if !gameBoard.IsLegalMove(newPos) {
+			continue
+		}
+		target := gameBoard.Grid[newX][newY]
+		if target == nil || target.GetPlayer() != k.Player {
+			moves = append(moves, []Position{newPos})
+		}
+	}
+
+	return moves
 }
 
 func (k *Knight) GetPlayer() string {
