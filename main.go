@@ -27,7 +27,6 @@ const (
 )
 
 var pieces = []string{"king", "queen", "rook", "bishop", "pawn", "knight"}
-var colors = []string{"blackpieces", "whitepieces"}
 
 func getPathToPieces(color, role string) []string {
 	var paths []string
