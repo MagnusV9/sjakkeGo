@@ -62,6 +62,8 @@ type King struct {
 func (k King) AvailableMoves(gameBoard *Board) [][]Position {
 	moves := [][]Position{}
 
+	// TODO implement castlling
+
 	// Iterate through all possible directions.
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
@@ -185,6 +187,8 @@ func (r Rook) Image() string {
 
 func (r Rook) AvailableMoves(gameBoard *Board) [][]Position {
 	moves := [][]Position{}
+
+	//TODO implement castling
 
 	// Horizontal and vertical directions
 	for _, direction := range [][]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}} {
@@ -315,7 +319,23 @@ func (p Pawn) Image() string {
 }
 
 func (p Pawn) AvailableMoves(gameBoard *Board) [][]Position {
-	return nil
+	moves := [][]Position{}
+
+	// TODO implement en pasant ruleset.
+
+	for _, direction := range [][]int{{-1, -1}, {-1, 1}, {1, -1}, {1, 1}} {
+		newX, newY := p.Pos.X+direction[0], p.Pos.Y+direction[1]
+		newPos := Position{X: newX, Y: newY}
+		if !gameBoard.IsLegalMove(newPos) {
+			continue
+		}
+		target := gameBoard.Grid[newX][newY]
+		if target == nil || target.GetPlayer() != p.Player {
+			moves = append(moves, []Position{newPos})
+		}
+	}
+
+	return moves
 }
 
 func (p *Pawn) GetPlayer() string {
