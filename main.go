@@ -67,8 +67,13 @@ func (k King) Image() string {
 	return k.ChessPiece.Image
 }
 
-func (k King) Move(gameBoard *Board, pos Position) {
+func (k *King) Move(gameBoard *Board, pos Position) {
 
+	if contains(k.AvailableMoves(gameBoard), pos) {
+		gameBoard.Grid[k.Pos.X][k.Pos.Y] = nil
+		k.Pos = pos
+		gameBoard.Grid[pos.X][pos.Y] = k
+	}
 }
 
 type Queen struct {
@@ -79,8 +84,12 @@ func (q Queen) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (q Queen) Move(gameBoard *Board, pos Position) {
-
+func (q *Queen) Move(gameBoard *Board, pos Position) {
+	if contains(q.AvailableMoves(gameBoard), pos) {
+		gameBoard.Grid[q.Pos.X][q.Pos.Y] = nil
+		q.Pos = pos
+		gameBoard.Grid[pos.X][pos.Y] = q
+	}
 }
 
 func (q Queen) Image() string {
@@ -99,8 +108,12 @@ func (r Rook) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (r Rook) Move(gameBoard *Board, pos Position) {
-
+func (r *Rook) Move(gameBoard *Board, pos Position) {
+	if contains(r.AvailableMoves(gameBoard), pos) {
+		gameBoard.Grid[r.Pos.X][r.Pos.Y] = nil
+		r.Pos = pos
+		gameBoard.Grid[pos.X][pos.Y] = r
+	}
 }
 
 type Bishop struct {
@@ -115,8 +128,12 @@ func (b Bishop) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (b Bishop) Move(gameBoard *Board, pos Position) {
-
+func (b *Bishop) Move(gameBoard *Board, pos Position) {
+	if contains(b.AvailableMoves(gameBoard), pos) {
+		gameBoard.Grid[b.Pos.X][b.Pos.Y] = nil
+		b.Pos = pos
+		gameBoard.Grid[pos.X][pos.Y] = b
+	}
 }
 
 type Knight struct {
@@ -151,8 +168,12 @@ func (p Pawn) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (p Pawn) Move(gameBoard *Board, pos Position) {
-
+func (p *Pawn) Move(gameBoard *Board, pos Position) {
+	if contains(p.AvailableMoves(gameBoard), pos) {
+		gameBoard.Grid[p.Pos.X][p.Pos.Y] = nil
+		p.Pos = pos
+		gameBoard.Grid[pos.X][pos.Y] = p
+	}
 }
 
 type Board struct {
