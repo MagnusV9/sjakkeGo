@@ -73,6 +73,7 @@ func (k King) AvailableMoves(gameBoard *Board) [][]Position {
 
 			// Check if the move is within the board.
 			newPos := Position{X: newX, Y: newY}
+
 			if !gameBoard.IsLegalMove(newPos) {
 				continue
 			}
