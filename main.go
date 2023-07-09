@@ -10,11 +10,20 @@ import (
 	"log"
 )
 
+func contains(board [][]Position, pos Position) bool {
+	for _, row := range board {
+		for _, position := range row {
+			if position == pos {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 const (
-	playerPathPrefix      = "./assets"
-	opponentPathPrefix    = "./assets"
-	playerPiecesSubPath   = "player"
-	opponentPiecesSubPath = "opponent"
+	player   = "player"
+	opponent = "opponent"
 )
 
 var pieces = []string{"king", "queen", "rook", "bishop", "pawn", "knight"}
@@ -22,13 +31,9 @@ var colors = []string{"blackpieces", "whitepieces"}
 
 func getPathToPieces(color, role string) []string {
 	var paths []string
-	prefix := playerPathPrefix
-	if role == "opponent" {
-		prefix = opponentPathPrefix
-	}
 
 	for _, piece := range pieces {
-		paths = append(paths, prefix+"/"+color+"/"+role+"/"+piece+".svg")
+		paths = append(paths, "./assets"+"/"+color+"/"+role+"/"+piece+".svg")
 	}
 
 	return paths
@@ -39,8 +44,8 @@ type Position struct {
 }
 
 type Piece interface {
-	AvailableMoves(gameBoard Board) [][]Position
-	Move(gameBoard *Board)
+	AvailableMoves(gameBoard *Board) [][]Position
+	Move(gameBoard *Board, pos Position)
 	Image() string
 }
 
@@ -50,47 +55,11 @@ type ChessPiece struct {
 	Pos    Position
 }
 
-func drawPiece(piece Piece) *canvas.Image {
-	svgData, err := ioutil.ReadFile(piece.Image())
-	if err != nil {
-		log.Fatalf("Failed to read file: %v", err)
-	}
-
-	svgResource := fyne.NewStaticResource(piece.Image(), svgData)
-
-	return canvas.NewImageFromResource(svgResource)
-}
-
-func paintChessBoard(chessBoard *GUIBoard, gameBoard *Board) {
-	for i := 0; i < chessBoard.Rows; i++ {
-		for j := 0; j < chessBoard.Cols; j++ {
-			rect := canvas.NewRectangle(&color.RGBA{R: 150, G: 77, B: 55, A: 1})
-			if (i+j)%2 == 0 {
-				rect.FillColor = color.White
-			}
-			rect.Refresh()
-
-			// create a container for the square
-			square := container.NewMax(rect)
-
-			// draw piece if it exists
-			piece := gameBoard.Grid[i][j]
-			if piece != nil {
-				img := drawPiece(piece)
-				img.FillMode = canvas.ImageFillContain
-				square.Add(img)
-			}
-
-			chessBoard.Grid[i][j] = square
-		}
-	}
-}
-
 type King struct {
 	ChessPiece
 }
 
-func (k King) AvailableMoves(gameBoard Board) [][]Position {
+func (k King) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
@@ -98,7 +67,7 @@ func (k King) Image() string {
 	return k.ChessPiece.Image
 }
 
-func (k King) Move(gameBoard *Board) {
+func (k King) Move(gameBoard *Board, pos Position) {
 
 }
 
@@ -106,11 +75,11 @@ type Queen struct {
 	ChessPiece
 }
 
-func (q Queen) AvailableMoves(gameBoard Board) [][]Position {
+func (q Queen) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (q Queen) Move(gameBoard *Board) {
+func (q Queen) Move(gameBoard *Board, pos Position) {
 
 }
 
@@ -126,11 +95,11 @@ func (r Rook) Image() string {
 	return r.ChessPiece.Image
 }
 
-func (r Rook) AvailableMoves(gameBoard Board) [][]Position {
+func (r Rook) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (r Rook) Move(gameBoard *Board) {
+func (r Rook) Move(gameBoard *Board, pos Position) {
 
 }
 
@@ -142,11 +111,11 @@ func (b Bishop) Image() string {
 	return b.ChessPiece.Image
 }
 
-func (b Bishop) AvailableMoves(gameBoard Board) [][]Position {
+func (b Bishop) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (b Bishop) Move(gameBoard *Board) {
+func (b Bishop) Move(gameBoard *Board, pos Position) {
 
 }
 
@@ -158,12 +127,16 @@ func (k Knight) Image() string {
 	return k.ChessPiece.Image
 }
 
-func (k Knight) AvailableMoves(gameBoard Board) [][]Position {
+func (k Knight) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (k Knight) Move(gameBoard *Board) {
-
+func (k *Knight) Move(gameBoard *Board, pos Position) {
+	if contains(k.AvailableMoves(gameBoard), pos) {
+		gameBoard.Grid[k.Pos.X][k.Pos.Y] = nil
+		k.Pos = pos
+		gameBoard.Grid[pos.X][pos.Y] = k
+	}
 }
 
 type Pawn struct {
@@ -174,16 +147,21 @@ func (p Pawn) Image() string {
 	return p.ChessPiece.Image
 }
 
-func (p Pawn) AvailableMoves(gameBoard Board) [][]Position {
+func (p Pawn) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
-func (p Pawn) Move(gameBoard *Board) {
+func (p Pawn) Move(gameBoard *Board, pos Position) {
 
 }
 
 type Board struct {
 	Grid [][]Piece
+}
+
+func (b Board) IsLegalMove(pos Position) bool {
+	legal := len(b.Grid)
+	return pos.X <= legal && pos.X >= 0 && pos.Y <= legal && pos.Y >= 0
 }
 
 func NewBoard() *Board {
@@ -200,10 +178,10 @@ func NewBoard() *Board {
 
 func (b *Board) SetupBoard() {
 	for i := 0; i < 2; i++ {
-		b.SetupRow(i, "white", "player")
+		b.SetupRow(i, "black", "opponent")
 	}
 	for i := 6; i < 8; i++ {
-		b.SetupRow(i, "black", "opponent")
+		b.SetupRow(i, "white", "player")
 	}
 }
 
@@ -251,6 +229,41 @@ func layoutForChessboard(board *GUIBoard) fyne.CanvasObject {
 	return grid
 }
 
+func drawPiece(piece Piece) *canvas.Image {
+	svgData, err := ioutil.ReadFile(piece.Image())
+	if err != nil {
+		log.Fatalf("Failed to read file: %v", err)
+	}
+
+	svgResource := fyne.NewStaticResource(piece.Image(), svgData)
+
+	return canvas.NewImageFromResource(svgResource)
+}
+
+func paintChessBoard(chessBoard *GUIBoard, gameBoard *Board) {
+	for i := 0; i < chessBoard.Rows; i++ {
+		for j := 0; j < chessBoard.Cols; j++ {
+			rect := canvas.NewRectangle(&color.RGBA{R: 150, G: 77, B: 55, A: 1})
+			if (i+j)%2 == 0 {
+				rect.FillColor = color.White
+			}
+			rect.Refresh()
+
+			// create a container for the square
+			square := container.NewMax(rect)
+
+			// draw piece if it exists
+			piece := gameBoard.Grid[i][j]
+			if piece != nil {
+				img := drawPiece(piece)
+				img.FillMode = canvas.ImageFillContain
+				square.Add(img)
+			}
+
+			chessBoard.Grid[i][j] = square
+		}
+	}
+}
 func main() {
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Chess")
