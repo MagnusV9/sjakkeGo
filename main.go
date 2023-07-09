@@ -46,6 +46,7 @@ type Piece interface {
 	AvailableMoves(gameBoard *Board) [][]Position
 	Move(gameBoard *Board, pos Position)
 	Image() string
+	GetPlayer() string
 }
 
 type ChessPiece struct {
@@ -59,7 +60,35 @@ type King struct {
 }
 
 func (k King) AvailableMoves(gameBoard *Board) [][]Position {
-	return nil
+	moves := [][]Position{}
+
+	// Iterate through all possible directions.
+	for dx := -1; dx <= 1; dx++ {
+		for dy := -1; dy <= 1; dy++ {
+			if dx == 0 && dy == 0 {
+				continue
+			}
+
+			newX, newY := k.Pos.X+dx, k.Pos.Y+dy
+
+			// Check if the move is within the board.
+			newPos := Position{X: newX, Y: newY}
+			if !gameBoard.IsLegalMove(newPos) {
+				continue
+			}
+
+			// Check if the target position is empty or contains an opponent's piece.
+			target := gameBoard.Grid[newX][newY]
+			if target == nil || target.GetPlayer() != k.Player {
+				// TODO: Check if the move would put the king in check.
+				if !gameBoard.isCheck(k.Player, newPos) {
+					moves = append(moves, []Position{newPos})
+				}
+			}
+		}
+	}
+
+	return moves
 }
 
 func (k King) Image() string {
@@ -75,12 +104,20 @@ func (k *King) Move(gameBoard *Board, pos Position) {
 	}
 }
 
+func (k *King) GetPlayer() string {
+	return k.Player
+}
+
 type Queen struct {
 	ChessPiece
 }
 
 func (q Queen) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
+}
+
+func (q *Queen) GetPlayer() string {
+	return q.Player
 }
 
 func (q *Queen) Move(gameBoard *Board, pos Position) {
@@ -107,6 +144,10 @@ func (r Rook) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
+func (r *Rook) GetPlayer() string {
+	return r.Player
+}
+
 func (r *Rook) Move(gameBoard *Board, pos Position) {
 	if contains(r.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[r.Pos.X][r.Pos.Y] = nil
@@ -125,6 +166,10 @@ func (b Bishop) Image() string {
 
 func (b Bishop) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
+}
+
+func (b *Bishop) GetPlayer() string {
+	return b.Player
 }
 
 func (b *Bishop) Move(gameBoard *Board, pos Position) {
@@ -147,6 +192,10 @@ func (k Knight) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
+func (k *Knight) GetPlayer() string {
+	return k.Player
+}
+
 func (k *Knight) Move(gameBoard *Board, pos Position) {
 	if contains(k.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[k.Pos.X][k.Pos.Y] = nil
@@ -167,6 +216,10 @@ func (p Pawn) AvailableMoves(gameBoard *Board) [][]Position {
 	return nil
 }
 
+func (p *Pawn) GetPlayer() string {
+	return p.Player
+}
+
 func (p *Pawn) Move(gameBoard *Board, pos Position) {
 	if contains(p.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[p.Pos.X][p.Pos.Y] = nil
@@ -177,6 +230,22 @@ func (p *Pawn) Move(gameBoard *Board, pos Position) {
 
 type Board struct {
 	Grid [][]Piece
+}
+
+func (b *Board) isCheck(player string, position Position) bool {
+	for _, row := range b.Grid {
+		for _, piece := range row {
+			if piece != nil && piece.GetPlayer() != player {
+				moves := piece.AvailableMoves(b)
+				for _, move := range moves {
+					if move[0] == position {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
 }
 
 func (b Board) IsLegalMove(pos Position) bool {
