@@ -44,7 +44,7 @@ type Position struct {
 
 type Piece interface {
 	AvailableMoves(gameBoard *Board) [][]Position
-	Move(gameBoard *Board, pos Position)
+	Move(gameBoard *Board, pos Position) bool
 	Image() string
 	GetPlayer() string
 }
@@ -57,6 +57,7 @@ type ChessPiece struct {
 
 type King struct {
 	ChessPiece
+	HasMoved bool
 }
 
 func (k King) AvailableMoves(gameBoard *Board) [][]Position {
@@ -98,13 +99,16 @@ func (k King) Image() string {
 	return k.ChessPiece.Image
 }
 
-func (k *King) Move(gameBoard *Board, pos Position) {
+func (k *King) Move(gameBoard *Board, pos Position) bool {
 
 	if contains(k.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[k.Pos.X][k.Pos.Y] = nil
 		k.Pos = pos
 		gameBoard.Grid[pos.X][pos.Y] = k
+		k.HasMoved = true
+		return true
 	}
+	return false
 }
 
 func (k *King) GetPlayer() string {
@@ -165,12 +169,14 @@ func (q *Queen) GetPlayer() string {
 	return q.Player
 }
 
-func (q *Queen) Move(gameBoard *Board, pos Position) {
+func (q *Queen) Move(gameBoard *Board, pos Position) bool {
 	if contains(q.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[q.Pos.X][q.Pos.Y] = nil
 		q.Pos = pos
 		gameBoard.Grid[pos.X][pos.Y] = q
+		return true
 	}
+	return false
 }
 
 func (q Queen) Image() string {
@@ -217,12 +223,14 @@ func (r *Rook) GetPlayer() string {
 	return r.Player
 }
 
-func (r *Rook) Move(gameBoard *Board, pos Position) {
+func (r *Rook) Move(gameBoard *Board, pos Position) bool {
 	if contains(r.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[r.Pos.X][r.Pos.Y] = nil
 		r.Pos = pos
 		gameBoard.Grid[pos.X][pos.Y] = r
+		return true
 	}
+	return false
 }
 
 type Bishop struct {
@@ -263,12 +271,14 @@ func (b *Bishop) GetPlayer() string {
 	return b.Player
 }
 
-func (b *Bishop) Move(gameBoard *Board, pos Position) {
+func (b *Bishop) Move(gameBoard *Board, pos Position) bool {
 	if contains(b.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[b.Pos.X][b.Pos.Y] = nil
 		b.Pos = pos
 		gameBoard.Grid[pos.X][pos.Y] = b
+		return true
 	}
+	return false
 }
 
 type Knight struct {
@@ -302,12 +312,14 @@ func (k *Knight) GetPlayer() string {
 	return k.Player
 }
 
-func (k *Knight) Move(gameBoard *Board, pos Position) {
+func (k *Knight) Move(gameBoard *Board, pos Position) bool {
 	if contains(k.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[k.Pos.X][k.Pos.Y] = nil
 		k.Pos = pos
 		gameBoard.Grid[pos.X][pos.Y] = k
+		return true
 	}
+	return false
 }
 
 type Pawn struct {
@@ -349,12 +361,14 @@ func (p *Pawn) GetPlayer() string {
 	return p.Player
 }
 
-func (p *Pawn) Move(gameBoard *Board, pos Position) {
+func (p *Pawn) Move(gameBoard *Board, pos Position) bool {
 	if contains(p.AvailableMoves(gameBoard), pos) {
 		gameBoard.Grid[p.Pos.X][p.Pos.Y] = nil
 		p.Pos = pos
 		gameBoard.Grid[pos.X][pos.Y] = p
+		return true
 	}
+	return false
 }
 
 type Board struct {
@@ -414,7 +428,7 @@ func (b *Board) SetupRow(row int, color, role string) {
 		b.Grid[row][1], b.Grid[row][6] = &Knight{ChessPiece{piecePaths[5], color, Position{X: row, Y: 1}}}, &Knight{ChessPiece{piecePaths[5], color, Position{X: row, Y: 6}}}
 		b.Grid[row][2], b.Grid[row][5] = &Bishop{ChessPiece{piecePaths[3], color, Position{X: row, Y: 2}}}, &Bishop{ChessPiece{piecePaths[3], color, Position{X: row, Y: 5}}}
 		b.Grid[row][3] = &Queen{ChessPiece{piecePaths[1], color, Position{X: row, Y: 3}}}
-		b.Grid[row][4] = &King{ChessPiece{piecePaths[0], color, Position{X: row, Y: 4}}}
+		b.Grid[row][4] = &King{ChessPiece{piecePaths[0], color, Position{X: row, Y: 4}}, HasMoved: false}
 	}
 }
 
