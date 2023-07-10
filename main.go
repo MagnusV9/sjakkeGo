@@ -64,6 +64,13 @@ func (k King) AvailableMoves(gameBoard *Board) [][]Position {
 	moves := [][]Position{}
 
 	// TODO implement castlling
+	var rookPos [][]int
+	if k.Player == "player" {
+		rookPos = [][]int{{}}
+	}
+	if !k.HasMoved {
+		rookPos = [][]int{{1, 1}}
+	}
 
 	// Iterate through all possible directions.
 	for dx := -1; dx <= 1; dx++ {
@@ -428,7 +435,7 @@ func (b *Board) SetupRow(row int, color, role string) {
 		b.Grid[row][1], b.Grid[row][6] = &Knight{ChessPiece{piecePaths[5], color, Position{X: row, Y: 1}}}, &Knight{ChessPiece{piecePaths[5], color, Position{X: row, Y: 6}}}
 		b.Grid[row][2], b.Grid[row][5] = &Bishop{ChessPiece{piecePaths[3], color, Position{X: row, Y: 2}}}, &Bishop{ChessPiece{piecePaths[3], color, Position{X: row, Y: 5}}}
 		b.Grid[row][3] = &Queen{ChessPiece{piecePaths[1], color, Position{X: row, Y: 3}}}
-		b.Grid[row][4] = &King{ChessPiece{piecePaths[0], color, Position{X: row, Y: 4}}, HasMoved: false}
+		b.Grid[row][4] = &King{ChessPiece: ChessPiece{piecePaths[0], color, Position{X: row, Y: 4}}, HasMoved: false}
 	}
 }
 
