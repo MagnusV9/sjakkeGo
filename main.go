@@ -322,8 +322,15 @@ func (p Pawn) AvailableMoves(gameBoard *Board) [][]Position {
 	moves := [][]Position{}
 
 	// TODO implement en pasant ruleset.
+	var pawnDir [][]int
 
-	for _, direction := range [][]int{{-1, -1}, {-1, 1}, {-1,0} {1, -1}, {1, 1}, {1,0}} { // TODO dette er feil, må sjekke om det er player eller opponent for å vite hvilken retning den skal gå.
+	if p.Player == "player" {
+		pawnDir = [][]int{{1, 0}, {1, -1}, {1, 0}}
+	} else {
+		pawnDir = [][]int{{-1, -1}, {-1, 1}, {-1, 0}}
+	}
+
+	for _, direction := range pawnDir { // TODO sjekk for en passant.
 		newX, newY := p.Pos.X+direction[0], p.Pos.Y+direction[1]
 		newPos := Position{X: newX, Y: newY}
 		if !gameBoard.IsLegalMove(newPos) {
