@@ -382,17 +382,28 @@ type Board struct {
 	Grid [][]Piece
 }
 
-// det her e en teit måte å gjør det på. Sjekk heller state av boardet for å se om det e en check
+func (b *Board) GetKing(player string) (King, error){
+	for _, row := range b.Grid{
+		for _, piece := range row{
+			if king, isKing := piece.(King); isKing && king.GetPlayer() == player{
+				return king, nil
+			}
+		}
+	}
+	return King{}, errors.New("King not found Whaaatt????")
+}
+
+// må kanskje bruk goroutines for at det ikke skal bli treigt
 func (b *Board) IsCheck(player string, position Position) bool {
-	for _, row := range b.Grid {
-		for _, piece := range row {
-			if piece != nil && piece.GetPlayer() != player {
-				moves := piece.AvailableMoves(b)
-				for _, move := range moves {
-					if move[0] == position {
-						return true
-					}
-				}
+	for _, row := range b.Grid{
+		for _, piece := range row{
+			if piece.GetPlayer() == player{ // det her e kanskje feil ??? 
+				continue;
+			}
+			moves := piece.AvailableMoves(b)	
+			if king, err := GetKing(player); err != nil{
+				moves.contains(king.Pos)
+				return true
 			}
 		}
 	}
