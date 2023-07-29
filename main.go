@@ -10,6 +10,9 @@ import (
 	"log"
 )
 
+
+
+
 func contains(board [][]Position, pos Position) bool {
 	for _, row := range board {
 		for _, position := range row {
@@ -38,6 +41,8 @@ func getPathToPieces(color, role string) []string {
 	return paths
 }
 
+
+
 type Position struct {
 	X, Y int
 }
@@ -64,13 +69,7 @@ func (k King) AvailableMoves(gameBoard *Board) [][]Position {
 	moves := [][]Position{}
 
 	// TODO implement castlling
-	var rookPos [][]int
-	if k.Player == "player" {
-		rookPos = [][]int{{}}
-	}
-	if !k.HasMoved {
-		rookPos = [][]int{{1, 1}}
-	}
+	
 
 	// Iterate through all possible directions.
 	for dx := -1; dx <= 1; dx++ {
@@ -338,6 +337,7 @@ func (p Pawn) Image() string {
 }
 
 func (p Pawn) AvailableMoves(gameBoard *Board) [][]Position {
+
 	moves := [][]Position{}
 
 	// TODO implement en pasant ruleset.
@@ -382,7 +382,8 @@ type Board struct {
 	Grid [][]Piece
 }
 
-func (b *Board) isCheck(player string, position Position) bool {
+// det her e en teit måte å gjør det på. Sjekk heller state av boardet for å se om det e en check
+func (b *Board) IsCheck(player string, position Position) bool {
 	for _, row := range b.Grid {
 		for _, piece := range row {
 			if piece != nil && piece.GetPlayer() != player {
@@ -398,9 +399,12 @@ func (b *Board) isCheck(player string, position Position) bool {
 	return false
 }
 
-func (b Board) IsLegalMove(pos Position) bool {
+func (b *Board) IsLegalMove(pos Position) bool {
 	legal := len(b.Grid)
 	return pos.X <= legal && pos.X >= 0 && pos.Y <= legal && pos.Y >= 0
+}
+
+func(b *Board) IsCheckmate(player string){
 }
 
 func NewBoard() *Board {
