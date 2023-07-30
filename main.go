@@ -68,6 +68,10 @@ type King struct {
 func (k King) AvailableMoves(gameBoard *Board) [][]Position {
 	moves := [][]Position{}
 
+	if(gameBoard.IsCheck(k.Player)){
+		//TODO implement logic to handle what to do if the player is in check. 
+	}
+
 	// TODO implement castlling
 	
 
@@ -79,10 +83,7 @@ func (k King) AvailableMoves(gameBoard *Board) [][]Position {
 			}
 
 			newX, newY := k.Pos.X+dx, k.Pos.Y+dy
-
-			// Check if the move is within the board.
 			newPos := Position{X: newX, Y: newY}
-
 			if !gameBoard.IsLegalMove(newPos) {
 				continue
 			}
@@ -90,7 +91,6 @@ func (k King) AvailableMoves(gameBoard *Board) [][]Position {
 			// Check if the target position is empty or contains an opponent's piece.
 			target := gameBoard.Grid[newX][newY]
 			if target == nil || target.GetPlayer() != k.Player {
-				// TODO: Check if the move would put the king in check.
 				if !gameBoard.isCheck(k.Player, newPos) {
 					moves = append(moves, []Position{newPos})
 				}
@@ -139,11 +139,9 @@ func (q Queen) AvailableMoves(gameBoard *Board) [][]Position {
 			target := gameBoard.Grid[newX][newY]
 			if target == nil {
 				moves = append(moves, []Position{newPos})
-			} else {
-				if target.GetPlayer() != q.Player {
-					moves = append(moves, []Position{newPos})
-				}
-				break
+			}
+			if target.GetPlayer() != q.Player {
+				moves = append(moves, []Position{newPos})
 			}
 		}
 	}
@@ -159,11 +157,9 @@ func (q Queen) AvailableMoves(gameBoard *Board) [][]Position {
 			target := gameBoard.Grid[newX][newY]
 			if target == nil {
 				moves = append(moves, []Position{newPos})
-			} else {
-				if target.GetPlayer() != q.Player {
-					moves = append(moves, []Position{newPos})
-				}
-				break
+			}
+			if target.GetPlayer() != q.Player {
+				moves = append(moves, []Position{newPos})
 			}
 		}
 	}
@@ -382,6 +378,7 @@ type Board struct {
 	Grid [][]Piece
 }
 
+// finds the king of the given player.
 func (b *Board) GetKing(player string) (King, error){
 	for _, row := range b.Grid{
 		for _, piece := range row{
@@ -394,14 +391,15 @@ func (b *Board) GetKing(player string) (King, error){
 }
 
 // må kanskje bruk goroutines for at det ikke skal bli treigt
-func (b *Board) IsCheck(player string, position Position) bool {
+//Checks whteher a given player is in check.
+func (b *Board) IsCheck(player string) bool {
 	for _, row := range b.Grid{
 		for _, piece := range row{
 			if piece.GetPlayer() == player{ // det her e kanskje feil ??? 
 				continue;
 			}
 			moves := piece.AvailableMoves(b)	
-			if king, err := GetKing(player); err != nil{
+			if king, err := b.GetKing(player); err != nil{
 				moves.contains(king.Pos)
 				return true
 			}
@@ -410,14 +408,16 @@ func (b *Board) IsCheck(player string, position Position) bool {
 	return false
 }
 
-func (b *Board) IsLegalMove(pos Position) bool {
+func (b *Board) IsLegalMove(pos Position, player string) bool {
 	legal := len(b.Grid)
-	return pos.X <= legal && pos.X >= 0 && pos.Y <= legal && pos.Y >= 0
+	return pos.X <= legal && pos.X >= 0 && pos.Y <= legal && pos.Y >= 0 && !isCheck(player) 
 }
 
+// Checks if a given player is in check mate.
 func(b *Board) IsCheckmate(player string){
 }
 
+// Creates a new Board
 func NewBoard() *Board {
 	board := &Board{
 		Grid: make([][]Piece, 8),
@@ -430,6 +430,7 @@ func NewBoard() *Board {
 	return board
 }
 
+// Sets up the Board with pieces.
 func (b *Board) SetupBoard() {
 	for i := 0; i < 2; i++ {
 		b.SetupRow(i, "black", "opponent")
@@ -439,6 +440,7 @@ func (b *Board) SetupBoard() {
 	}
 }
 
+// Sets up the given row with the correct pieces.
 func (b *Board) SetupRow(row int, color, role string) {
 	piecePaths := getPathToPieces(color, role)
 	for col := 0; col < 8; col++ {
