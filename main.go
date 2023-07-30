@@ -520,6 +520,28 @@ func paintChessBoard(chessBoard *GUIBoard, gameBoard *Board) {
 		}
 	}
 }
+
+func markAvailableMoves(chessBoard *Board, guiBoard *GUIBoard, selectedPiece Piece){
+	availableMoves := selectedPiece.AvailableMoves(chessBoard)
+	for _, move := range availableMoves{
+		guiBoard[move.X][move.Y].color = color.RGBA{R: 128, G: 128, B: 128, A: 1}
+		guiBoard[move.X][move.Y].Refresh()
+	}
+}
+
+func unmarkAvailableMoves(moves []Position, guiBoard *GUIBoard){
+	for _, move := range moves{
+		if (move.X + move.Y)% 2 == 0{
+			guiBoard[move.X][move.Y].color = color.RGBA{R: 150, G: 77, B: 55, A: 1}
+		}  else{
+			guiBoard[move.X][move.Y].color = color.RGBA{R: 255, G: 255, B: 255, A: 1}
+		}
+		guiBoard[move.X][move.Y].Refresh()
+	}	
+}
+
+
+
 func main() {
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Chess")
