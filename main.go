@@ -8,6 +8,7 @@ import (
 	"image/color"
 	"io/ioutil"
 	"log"
+	"fyne.io/fyne/v2/widget"
 )
 
 
@@ -455,17 +456,18 @@ func (b *Board) SetupRow(row int, color, role string) {
 		b.Grid[row][4] = &King{ChessPiece: ChessPiece{piecePaths[0], color, Position{X: row, Y: 4}}, HasMoved: false}
 	}
 }
-
 type GUIBoard struct {
 	Grid       [][]fyne.CanvasObject
 	Rows, Cols int
+	gameBoard  *Board
 }
 
-func newGUIBoard(rows, cols int) *GUIBoard {
+func newGUIBoard(rows, cols int, gameBoard *Board) *GUIBoard {
 	board := &GUIBoard{
-		Grid: make([][]fyne.CanvasObject, rows),
-		Rows: rows,
-		Cols: cols,
+		Grid:      make([][]fyne.CanvasObject, rows),
+		Rows:      rows,
+		Cols:      cols,
+		gameBoard: gameBoard,
 	}
 
 	for i := range board.Grid {
@@ -474,6 +476,8 @@ func newGUIBoard(rows, cols int) *GUIBoard {
 
 	return board
 }
+
+
 
 //TODO add a button to evry cell.
 func layoutForChessboard(board *GUIBoard) fyne.CanvasObject {
@@ -497,7 +501,7 @@ func drawPiece(piece Piece) *canvas.Image {
 	return canvas.NewImageFromResource(svgResource)
 }
 
-func paintChessBoard(chessBoard *GUIBoard, gameBoard *Board) {
+func paintChessBoard(chessBoard *GUIBoard) {
 	for i := 0; i < chessBoard.Rows; i++ {
 		for j := 0; j < chessBoard.Cols; j++ {
 			rect := canvas.NewRectangle(&color.RGBA{R: 150, G: 77, B: 55, A: 1})
@@ -509,8 +513,17 @@ func paintChessBoard(chessBoard *GUIBoard, gameBoard *Board) {
 			// create a container for the square
 			square := container.NewMax(rect)
 
+			// Add a button
+			button := widget.NewButton("", func() {
+				// Handle button click
+				// You need to implement this function to handle button clicks
+				// This could involve selecting a piece and then a destination square
+				handleButtonClick(i, j, c hessBoard)
+			})
+			square.Add(button)
+
 			// draw piece if it exists
-			piece := gameBoard.Grid[i][j]
+			piece := chessBoard.gameBoard.Grid[i][j]
 			if piece != nil {
 				img := drawPiece(piece)
 				img.FillMode = canvas.ImageFillContain
@@ -520,6 +533,16 @@ func paintChessBoard(chessBoard *GUIBoard, gameBoard *Board) {
 			chessBoard.Grid[i][j] = square
 		}
 	}
+}
+
+// Det e her gameloop faktisk vil skje. 
+func handleButtonClick(x, y int, chessBoard *GUIBoard) {
+	stateBoard := chessBoard.gameBoard
+	
+
+
+
+
 }
 
 func markAvailableMoves(chessBoard *Board, guiBoard *GUIBoard, selectedPiece Piece){
@@ -542,19 +565,20 @@ func unmarkAvailableMoves(moves []Position, guiBoard *GUIBoard){
 }
 
 
-
 func main() {
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Chess")
 
-	guiBoard := newGUIBoard(8, 8)
-
 	gameBoard := NewBoard()
 	gameBoard.SetupBoard()
 
-	paintChessBoard(guiBoard, gameBoard)
+	guiBoard := newGUIBoard(8, 8, gameBoard)
+
+	paintChessBoard(guiBoard)
 
 	content := layoutForChessboard(guiBoard)
 	myWindow.SetContent(content)
 	myWindow.ShowAndRun()
 }
+
+
