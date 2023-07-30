@@ -475,6 +475,7 @@ func newGUIBoard(rows, cols int) *GUIBoard {
 	return board
 }
 
+//TODO add a button to evry cell.
 func layoutForChessboard(board *GUIBoard) fyne.CanvasObject {
 	grid := container.NewGridWithColumns(board.Cols)
 	for _, row := range board.Grid {
