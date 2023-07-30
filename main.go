@@ -518,7 +518,7 @@ func paintChessBoard(chessBoard *GUIBoard) {
 				// Handle button click
 				// You need to implement this function to handle button clicks
 				// This could involve selecting a piece and then a destination square
-				handleButtonClick(i, j, c hessBoard)
+				clickHandler(i, j, c hessBoard)
 			})
 			square.Add(button)
 
@@ -535,8 +535,8 @@ func paintChessBoard(chessBoard *GUIBoard) {
 	}
 }
 
-// Det e her gameloop faktisk vil skje. 
-func handleButtonClick(x, y int, chessBoard *GUIBoard) {
+// Det e her gameloop faktisk vil skje. kan bruk fargen på brette til å bestemm om du kan gjør et move, om fargen e grå så kan man rør sæ.
+func clickHandler(x, y int, chessBoard *GUIBoard) { 
 	stateBoard := chessBoard.gameBoard
 	
 
